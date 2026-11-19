@@ -37,4 +37,4 @@ const componentSCMSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-module.exports = mongoose.model(ComponentSCM, componentSCMSchema);
+module.exports = mongoose.model('ComponentSCM', componentSCMSchema);
