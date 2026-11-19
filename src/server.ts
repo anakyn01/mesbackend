@@ -58,7 +58,7 @@ return res.status(400).json({ success:false, message:'이메일과 비밀번호�
 );*/
 //조회 결과 개수가 0보다 크다면 이미 가입된 이메일이 존재한다는 뜻입니다.
 //where: 가 몽고에서는 빼고.
-const existingUser = await User.findOne({{email}});
+const existingUser = await User.findOne({email});
 if (existingUser){
 return res.status(409).json({success:false,message:'이미 존재하는 이메일 입니다'}); 
 }
