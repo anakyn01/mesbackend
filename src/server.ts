@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
 
-const sequelize = require('./db');
+const connectDB = require('./db');
 const User = require('./model/User');
 const ProcessLine = require('./model/ProcessLine');
 const ComponentSCM = require('./model/ComponentSCM');
@@ -16,7 +16,7 @@ const ProductionRecord = require('./model/ProductionRecord');
 const app = express();
 app.use(express.json());
 app.use(cors({
-origin:'http://localhost:3000',
+origin:true,
 credentials:true    
 }));
 
@@ -57,7 +57,8 @@ return res.status(400).json({ success:false, message:'이메일과 비밀번호�
 {outFormat:oracledb.OUT_FORMAT_OBJECT}
 );*/
 //조회 결과 개수가 0보다 크다면 이미 가입된 이메일이 존재한다는 뜻입니다.
-const existingUser = await User.findOne({where:{email}});
+//where: 가 몽고에서는 빼고.
+const existingUser = await User.findOne({{email}});
 if (existingUser){
 return res.status(409).json({success:false,message:'이미 존재하는 이메일 입니다'}); 
 }
@@ -134,17 +135,7 @@ app.get('/api/user/profile', verifyToken, async(req, res ) => {
 return res.status(200).json({success:true, user:req.user});
 });
 
-const PORT = process.env.PORT || 4000;
 
-sequelize.sync({force: false})//서버를 구동할때마다 테이블 드롭하고 새로만듬
-.then(() => {
-  console.log('');
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}).catch(err => {
-  console.error('',err);
-})
 
 //로그인 API (새로 추가됨)
 app.post('/api/auth/login', async(req, res) => {
@@ -155,12 +146,20 @@ const {email, password} = req.body;
 if(!email || !password){
 return res.status(400).json({ success:false, message:'이메일과 비밀번호를 입력해주세요.'});
 }
-
-const user = await User.findOne({where:{email}});
+//where:
+const user = await User.findOne({{email}});
 //사용자가 아닌경우
 if (!user) {
   return res.status(401).json({
     success:false, message:'존재하지 않는 이메일이거나 비밀번호가 틀렸습니다.'
+  })
+}
+
+//보안이 누락되엇음
+const isMatch = await bcrypt.compare(hashedPassword, user.password);
+if (!isMatch) {
+  return res.status(401).json({
+success:false, message: '존재하지 않는 이메일이거나 비밀번호가 틀렸습니다.'
   })
 }
 
@@ -258,9 +257,7 @@ return res.status(500).json({
 //4.비전 품질 검사 API (/quality)
 app.get('/api/quality/inspections', verifyToken, async(req, res) => {
   try{
-const inspections = await QualityInspection.findAll({
-  limit:50, order:[['INSPECTED_AT', 'DESC']]
-});
+const inspections = await QualityInspection.find().sort({inspectedAt: -1}).limit(50);
 return res.status(200).json({
   success:true, inspections //누락됨
 });
@@ -277,7 +274,7 @@ const { serialNumber, inspectionType,
 const inspection = await QualityInspection.create({
   serialNumber, inspectionType, result, defectReason, inspector
 });
-return res.status(201).json({sucess:true, inspection});
+return res.status(201).json({success:true, inspection});
   }catch(err){
  return res.status(500).json({
   success:false, message:'품질 검사 결과 등록 실패'});   
@@ -304,7 +301,7 @@ const equipment = await Equipment.create({
   equipmentName, cleanroomZone, 
   temperature, humidity, status
 });
-return res.status(201).json({sucess:true, equipment});
+return res.status(201).json({success:true, equipment});
   }catch(err){
 return res.status(500).json({
   success:false, message:'설비 상태 등록 실패'});    
@@ -354,3 +351,21 @@ return res.status(500).json({success:false,
   message:'통합 관제 데이터 등록 실패'});    
   }
 })
+
+const PORT = process.env.PORT || 4000;
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`렌더서버 실행중 (Port:${PORT}`);
+  })
+})
+
+/*sequelize.sync({force: false})//서버를 구동할때마다 테이블 드롭하고 새로만듬
+.then(() => {
+  console.log('');
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('',err);
+})*/
