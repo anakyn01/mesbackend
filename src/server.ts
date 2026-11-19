@@ -25,7 +25,7 @@ oracledb.outOfDateChecking = false;
 const dbConfig = {
 user: process.env.DB_USER || 'MES_USR',
 password:process.env.DB_PASSWORD || '1234',
-connectString:process.env.DB_CONNECTION_STRING || 'localhost:1521/XE'
+connectString:process.env.DB_CONNECTION_STRING || 'localhost:ㅎㅎ21/XE'
 };*/
 const JWT_SECRET = process.env.JWT_SECRET || 'aB3$fG9!zXqW#mK7*vL2@pN5$sD8%yH1';
 
@@ -58,6 +58,7 @@ return res.status(400).json({ success:false, message:'이메일과 비밀번호�
 );*/
 //조회 결과 개수가 0보다 크다면 이미 가입된 이메일이 존재한다는 뜻입니다.
 //where: 가 몽고에서는 빼고.
+
 const existingUser = await User.findOne({email});
 if (existingUser){
 return res.status(409).json({success:false,message:'이미 존재하는 이메일 입니다'}); 
@@ -147,7 +148,7 @@ if(!email || !password){
 return res.status(400).json({ success:false, message:'이메일과 비밀번호를 입력해주세요.'});
 }
 //where:
-const user = await User.findOne({{email}});
+const user = await User.findOne({email});
 //사용자가 아닌경우
 if (!user) {
   return res.status(401).json({
