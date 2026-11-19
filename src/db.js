@@ -1,14 +1,22 @@
 const mongoose = require('mongoose');
+//내장형
+const { MongoMemoryServer} = require('mongodb-memory-server');
+
+let mogood = null;
 
 const connectDB = async () => {
-    const uri = process.env.MONGO_URI;
+    
+    /* 링킹 const uri = process.env.MONGO_URI;
 
     if(!uri){
         console.error("Render 환경변수에 MONGO_URI가 설정되지 않았습니다.");
         process.exit(1);
-    }
+    } */
 
     try{
+mongod = await MongoMemoryServer.create();
+const uri = mongod.getUri()
+
 await mongoose.connect(uri);
 console.log('✅ Render - MongoDB Atlas 연결 성공')
     }catch(err){
