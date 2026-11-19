@@ -1,43 +1,32 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const mongoose = require('mongoose');
 
-const ProductionRecord = sequelize.define('ProductionRecord', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        field: 'ID'
-    },
+const productionRecordSchema = new mongoose.Schema({
     lineName: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        field: 'LINE_NAME'
+        type: String,
+        required: true,
+        maxlength: 100
     },
     targetCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        field: 'TARGET_COUNT' // 목표 생산 대수
+        type: Number,
+        default: 0 // 목표 생산 대수
     },
     actualCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        field: 'ACTUAL_COUNT' // 실제 양품 생산 대수
+        type: Number,
+        default: 0 // 실제 양품 생산 대수
     },
     defectCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        field: 'DEFECT_COUNT' // 불량 대수
+        type: Number,
+        default: 0 // 불량 대수
     },
     yieldRate: {
-        type: DataTypes.FLOAT,
-        defaultValue: 100.0,
-        field: 'YIELD_RATE' // 수율 (%)
+        type: Number,
+        default: 100.0 // 수율 (%)
     }
 }, {
-    tableName: 'PRODUCTION_RECORDS',
-    timestamps: true,
-    createdAt: 'RECORDED_AT',
-    updatedAt: 'UPDATED_AT'
+    collection: 'PRODUCTION_RECORDS',
+    timestamps: { createdAt: 'recordedAt', updatedAt: 'updatedAt' }, // 기록 시간 필드명 반영
+    toJSON: { virtuals: true }, // 응답 시 _id 값을 id로도 자동 포함
+    toObject: { virtuals: true }
 });
 
-module.exports = ProductionRecord;
+module.exports = mongoose.model('ProductionRecord', productionRecordSchema);

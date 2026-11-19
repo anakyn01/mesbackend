@@ -1,46 +1,40 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+//ORM[mysql, oracle{관계형 db테이블과 자바스크립트 객체}], ODM[몽고 db와 같은 NoSql(도큐먼트/JSON)]
 
-const ComponentSCM = sequelize.define('ComponentSCM', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        field: 'ID'
-    },
+/*const { DataTypes } = require('sequelize');
+const sequelize = require('../db');*/
+const mongoose = require('mongoose');
+
+const componentSCMSchema = new mongoose.Schema({
+//id가 사라짐 why 몽고db는 데이터를 저장할때.._id라는 고유한 기본 키(ObjectId)를 자동으로 생성해 주기 때문에 스키마에 id를 따로 적지 않습
     componentName: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        field: 'COMPONENT_NAME' // 예: "A19 Pro AP Chip", "48MP Camera Module"
+        type: String,
+        required: true,
+        maxlength: 100
     },
     category: {
-        type: DataTypes.STRING(50),
-        field: 'CATEGORY' // 예: "CHIP", "CAMERA", "FRAME", "DISPLAY"
+        type: String,
+        maxlength: 50
     },
     stockQuantity: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        field: 'STOCK_QUANTITY'
+        type: Number,
+        default: 0,
     },
     minThreshold: {
-        type: DataTypes.INTEGER,
-        defaultValue: 100,
-        field: 'MIN_THRESHOLD' // 최소 안전 재고
+        type: Number,
+        default: 100,
     },
     supplier: {
-        type: DataTypes.STRING(100),
-        field: 'SUPPLIER' // 협력사 이름
+        type: Number,
+        default:100
     },
     status: {
-        type: DataTypes.STRING(30),
-        defaultValue: 'NORMAL',
-        field: 'STATUS' // NORMAL(정상), WARNING(부족), DANGER(위험)
+        type: String
+        default: 'NORMAL',
+        maxlength:30
     }
 }, {
-    tableName: 'COMPONENT_SCM',
+    collection: 'COMPONENT_SCM',
     timestamps: true,
-    createdAt: 'CREATED_AT',
-    updatedAt: 'UPDATED_AT'
 });
 
-module.exports = ComponentSCM;
+module.exports = mongoose.model(ComponentSCM, componentSCMSchema);

@@ -1,64 +1,58 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const mongoose = require('mongoose');
 
-const User = sequelize.define('User', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true, // IDENTITY 자동 증가 매핑
-        field: 'ID'
-    },
+const userSchema = new mongoose.Schema({
     firstName: {
-        type: DataTypes.STRING(50),
-        field: 'FIRST_NAME'
+        type: String,
+        maxlength: 50
     },
     lastName: {
-        type: DataTypes.STRING(50),
-        field: 'LAST_NAME'
+        type: String,
+        maxlength: 50
     },
     email: {
-        type: DataTypes.STRING(100),
+        type: String,
+        required: true,
         unique: true,
-        allowNull: false,
-        field: 'EMAIL'
+        maxlength: 100
     },
     password: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-        field: 'PASSWORD'
+        type: String,
+        required: true,
+        maxlength: 255
     },
     companyName: {
-        type: DataTypes.STRING(100),
-        field: 'COMPANY_NAME'
+        type: String,
+        maxlength: 100
     },
     position: {
-        type: DataTypes.STRING(50),
-        field: 'POSITION'
+        type: String,
+        maxlength: 50
     },
     tel: {
-        type: DataTypes.STRING(30),
-        field: 'TEL'
+        type: String,
+        maxlength: 30
     },
     address: {
-        type: DataTypes.STRING(255),
-        field: 'ADDRESS'
+        type: String,
+        maxlength: 255
     },
     detailAddress: {
-        type: DataTypes.STRING(255),
-        field: 'DETAIL_ADDRESS'
+        type: String,
+        maxlength: 255
     },
     gender: {
-        type: DataTypes.STRING(20),
-        field: 'GENDER'
+        type: String,
+        maxlength: 20
     },
     createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        field: 'CREATED_AT'
+        type: Date,
+        default: Date.now
     }
 }, {
-    tableName: 'USERS',
-    timestamps: false // 수동으로 관리하므로 자동 타임스탬프 비활성화
+    collection: 'USERS',
+    timestamps: false, // 수동 createdAt 필드 사용
+    toJSON: { virtuals: true }, // 응답 시 _id 값을 id로도 자동 포함
+    toObject: { virtuals: true }
 });
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

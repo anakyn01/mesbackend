@@ -1,4 +1,23 @@
-const { Sequelize } = require('sequelize');
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+    const uri = process.env.MONGO_URI;
+
+    if(!uri){
+        console.error("Render 환경변수에 MONGO_URI가 설정되지 않았습니다.");
+        process.exit(1);
+    }
+
+    try{
+await mongoose.connect(uri);
+console.log('✅ Render - MongoDB Atlas 연결 성공')
+    }catch(err){
+console.error("MongoDB Atlas 연결 실패:", err.message);
+process.exit(1);
+    }
+};
+module.exports = connectDB;
+/*const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 // Sequelize와 오라클 연동 설정
@@ -17,4 +36,4 @@ const sequelize = new Sequelize(
     }
 );
 
-module.exports = sequelize;
+module.exports = sequelize;*/

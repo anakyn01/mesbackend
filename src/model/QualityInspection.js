@@ -1,41 +1,34 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const mongoose = require('mongoose');
 
-const QualityInspection = sequelize.define('QualityInspection', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        field: 'ID'
-    },
+const qualityInspectionSchema = new mongoose.Schema({
     serialNumber: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
+        type: String,
+        required: true,
         unique: true,
-        field: 'SERIAL_NUMBER' // 아이폰 개별 시리얼 번호
+        maxlength: 100 // 아이폰 개별 시리얼 번호
     },
     inspectionType: {
-        type: DataTypes.STRING(50),
-        field: 'INSPECTION_TYPE' // 예: "VISION_SCRATCH", "WATERPROOF_TEST"
+        type: String,
+        maxlength: 50 // 예: "VISION_SCRATCH", "WATERPROOF_TEST"
     },
     result: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        field: 'RESULT' // PASS 또는 FAIL
+        type: String,
+        required: true,
+        maxlength: 20 // PASS 또는 FAIL
     },
     defectReason: {
-        type: DataTypes.STRING(255),
-        field: 'DEFECT_REASON' // 불량 판정 시 사유
+        type: String,
+        maxlength: 255 // 불량 판정 시 사유
     },
     inspector: {
-        type: DataTypes.STRING(50),
-        field: 'INSPECTOR' // 담당 AI 유닛 또는 오퍼레이터
+        type: String,
+        maxlength: 50 // 담당 AI 유닛 또는 오퍼레이터
     }
 }, {
-    tableName: 'QUALITY_INSPECTIONS',
-    timestamps: true,
-    createdAt: 'INSPECTED_AT',
-    updatedAt: false
+    collection: 'QUALITY_INSPECTIONS',
+    timestamps: { createdAt: 'inspectedAt', updatedAt: false }, // 검사 시간만 기록
+    toJSON: { virtuals: true }, // 응답 시 _id 값을 id로도 자동 포함
+    toObject: { virtuals: true }
 });
 
-module.exports = QualityInspection;
+module.exports = mongoose.model('QualityInspection', qualityInspectionSchema);

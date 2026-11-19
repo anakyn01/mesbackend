@@ -1,40 +1,33 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const mongoose = require('mongoose');
 
-const ProcessLine = sequelize.define('ProcessLine', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        field: 'ID'
-    },
+const processLineSchema = new mongoose.Schema({
     lineName: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        field: 'LINE_NAME' // 예: "AP SMT Line 1", "Titanium CNC Line"
+        type: String,
+        required: true,
+        maxlength: 100 // 예: "AP SMT Line 1", "Titanium CNC Line"
     },
     processType: {
-        type: DataTypes.STRING(50),
-        field: 'PROCESS_TYPE' // 예: "SMT", "CNC", "ASSEMBLY"
+        type: String,
+        maxlength: 50 // 예: "SMT", "CNC", "ASSEMBLY"
     },
     status: {
-        type: DataTypes.STRING(30),
-        defaultValue: 'RUNNING',
-        field: 'STATUS' // RUNNING(가동), STOP(정지), MAINTENANCE(점검)
+        type: String,
+        default: 'RUNNING',
+        maxlength: 30 // RUNNING(가동), STOP(정지), MAINTENANCE(점검)
     },
     currentProduct: {
-        type: DataTypes.STRING(50),
-        field: 'CURRENT_PRODUCT' // 예: "iPhone 18 Pro"
+        type: String,
+        maxlength: 50 // 예: "iPhone 18 Pro"
     },
     operator: {
-        type: DataTypes.STRING(50),
-        field: 'OPERATOR'
+        type: String,
+        maxlength: 50
     }
 }, {
-    tableName: 'PROCESS_LINES',
-    timestamps: true,
-    createdAt: 'CREATED_AT',
-    updatedAt: 'UPDATED_AT'
+    collection: 'PROCESS_LINES',
+    timestamps: true, // createdAt, updatedAt 자동 생성
+    toJSON: { virtuals: true }, // 응답 시 _id 값을 id로도 자동 포함
+    toObject: { virtuals: true }
 });
 
-module.exports = ProcessLine;
+module.exports = mongoose.model('ProcessLine', processLineSchema);
