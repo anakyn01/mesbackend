@@ -28,7 +28,7 @@ const componentSCMSchema = new mongoose.Schema({
         default:100
     },
     status: {
-        type: String
+        type: String,
         default: 'NORMAL',
         maxlength:30
     }
